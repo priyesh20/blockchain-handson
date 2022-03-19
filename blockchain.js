@@ -7,13 +7,24 @@ class Block {
         this.timestamp = timestamp;
         this.data = data;
         this.hashOfLastBlock = hashOfLastBlock;
+        this.change = 0;
         this.hash = this.createHash()
     }
 
     createHash() {
         return crypto.createHmac('sha256', secret)
-        .update(this.id + this.timestamp + JSON.stringify(this.data) + this.hashOfLastBlock)
+        .update(this.change+this.id + this.timestamp + JSON.stringify(this.data) + this.hashOfLastBlock)
         .digest('hex')
+    }
+
+    mineTheBlock(difficulty) {
+        let hash = "";
+        while (hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+            this.change++;
+            hash = this.createHash();
+        }
+        console.log("mining done... ", hash);
+        this.hash = hash;
     }
 }
 
@@ -35,7 +46,7 @@ class BlockChain {
     // Dunction to add the block
     addBlock(block) {
         block.hashOfLastBlock = this.getLastBlockHash();
-        block.hash = block.createHash();
+        block.mineTheBlock(4);
         this.chain.push(block)
     }
 
@@ -64,4 +75,4 @@ handsOnCoin.chain[2].data.balance = 400
 handsOnCoin.chain[2].hash = handsOnCoin.chain[2].createHash() **/
 
 console.log("handsOnCoin: ", handsOnCoin);
-console.log("validate: ", handsOnCoin.isValidBlockchain());
+// console.log("validate: ", handsOnCoin.isValidBlockchain());
